@@ -1,3 +1,53 @@
+{% load static %}
+{% load pybo_filter %}
+<!DOCTYPE html>
 <html>
-    Detail
+<head>
+    <meta charset="UTF-8">
+    <title>Calendar</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'diary_detail.css' %}">
+</head>
+
+<body>
+    {% block content %}
+
+    <div class="post-details">
+        <h1 class="post-title">{{ detail_context.title }}</h1>
+        <div class="post-content">
+            <textarea readonly>{{ detail_context.content }}</textarea>
+        </div>
+        <table>
+          <tr>
+            <td>작성자:</td>
+            <td>{{ detail_context.author }}</td>
+          </tr>
+          <tr>
+            <td>카테고리:</td>
+            <td>{{ detail_context.category }}</td>
+          </tr>
+          <tr>
+            <td>작성일:</td>
+            <td>{{ detail_context.write_date }}</td>
+          </tr>
+        </table>
+
+        <div class="btn"><a class="goCalendar" href="{% url 'pybo:main' %}">돌아가기</a></div>
+        <div class="btn"><a id="delete_diary" href="javascript:void(0)"data-uri="{% url 'pybo:diary_delete' detail_context.write_date|date:'Y-m-d' data_key  %}">삭제</a></div>
+        <div class="btn"><a class="goModify" href="{% url 'pybo:diary_modify' detail_context.write_date|date:'Y-m-d' key %}">수정</a></div>
+
+
+      </div>
+    {% endblock %}
+</body>
+{% block script %}
+<script type="text/javascript">
+const delete_elements = document.getElementById("delete_diary");
+delete_elements.addEventListener('click', function() {
+        if(confirm("정말로 삭제하시겠습니까?")) {
+            location.href = this.dataset.uri;
+        };
+    });
+</script>
+
+{% endblock%}
 </html>
