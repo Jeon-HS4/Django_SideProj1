@@ -108,3 +108,7 @@ def diary_delete(request, dates, key):
     
     #return redirect('pybo:main')
     return redirect(f'/pybo/?years={2023}&month={6}')
+
+
+def test(request):
+    return render(request, 'pybo/diary_create.html')

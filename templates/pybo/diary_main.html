@@ -32,8 +32,7 @@
                 </tr>
             </thead>
             <br>
-            {{daily_write}}<hr>
-            {{diary_list}}
+
             <tbody>
                 {% for week in calendar_weeks %}
                 <tr>
@@ -62,7 +61,7 @@
                       <div class="daily">
                         {% for key in daily_write%}
                             {% if day.date.day == key|diary_day %}
-                            {{key}}
+                            
                                 {% with date=day.date|date:'Y-m-d' %}
                                   <span><a href="{% url 'pybo:diary_detail' date key|get_num %}">{{daily_write|diary_title:key}}</a></span>
                                 {%endwith%}
