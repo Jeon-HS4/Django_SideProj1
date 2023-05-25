@@ -2,9 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .models import Month, Day, Question
-from datetime import date,timedelta
-
-from datetime import date, timedelta
+from datetime import date,timedelta,datetime
 from calendar import monthrange
 
 
@@ -18,6 +16,7 @@ def main(request):
         end_date = date(year, month+1, 1) - timedelta(days=1)
     else:
         end_date = date(year+1, 1, 1) - timedelta(days=1)
+
         
     diary_list = Question.objects.filter(write_date__range=(start_date, end_date)).values()
 
@@ -82,6 +81,34 @@ def diary_create(request):
     
     return render(request, 'pybo/diary_create.html')
 
-def diary_detail(request, dates):
+def diary_detail(request, dates, key):
+    
+    dates = datetime.strptime(dates, '%Y-%m-%d').date()
 
-    return render(request,'pybo/diary_detail.html')
+    context_list = Question.objects.filter(write_date__date=dates).order_by('write_date')
+    detail_context = context_list[int(key)-1]
+    
+    context = {'detail_context': detail_context, 'data_key':key}
+
+    return render(request,'pybo/diary_detail.html', context)
+
+
+def diary_modify(request, dates, key):
+    
+    return render(request, 'pybo/diary_modify.html')
+
+
+
+def diary_delete(request, dates, key):
+    dates = datetime.strptime(dates, '%Y-%m-%d').date()
+    
+    delete_object = Question.objects.filter(write_date__date=dates).order_by('write_date')
+    delete_object = delete_object[int(key)-1]
+    delete_object.delete()
+    
+    #return redirect('pybo:main')
+    return redirect(f'/pybo/?years={2023}&month={6}')
+
+
+def test(request):
+    return render(request, 'pybo/diary_create.html')

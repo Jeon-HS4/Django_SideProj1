@@ -42,3 +42,8 @@ def get_date_str(dictionary):
 def diary_day(strings):
     strings = strings[:-2]
     return int(strings)
+
+@register.filter
+def get_num(strings):
+    strings = strings[-2:]
+    return int(strings)
