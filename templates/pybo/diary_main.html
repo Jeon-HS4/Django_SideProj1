@@ -32,13 +32,14 @@
                 </tr>
             </thead>
             <br>
-
+            {{daily_write}}<hr>
+            {{diary_list}}<hr>
             <tbody>
                 {% for week in calendar_weeks %}
                 <tr>
                   {% for day in week %}
                     <td>
-                      <span class="write"><a href="{% url 'pybo:diary_create' %}">+</a></span>
+                      <span class="write"><a href="{% url 'pybo:diary_create' %}">{{day.date.day}}</a></span>
                       
                       {% if day.is_current_month%}
                         {% if day.dayOfWeek == 0%}
@@ -61,7 +62,8 @@
                       <div class="daily">
                         {% for key in daily_write%}
                             {% if day.date.day == key|diary_day %}
-                            
+                            {{day.date.day}}
+                            {{key}}
                                 {% with date=day.date|date:'Y-m-d' %}
                                   <span><a href="{% url 'pybo:diary_detail' date key|get_num %}">{{daily_write|diary_title:key}}</a></span>
                                 {%endwith%}

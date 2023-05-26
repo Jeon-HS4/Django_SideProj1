@@ -1,7 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from .models import Month, Day, Question
+from django.utils import timezone
+
+from pybo.forms import QuestionForm
+from .models import Question
 from datetime import date,timedelta,datetime
 from calendar import monthrange
 
@@ -15,8 +18,7 @@ def main(request):
     if(month != 12):
         end_date = date(year, month+1, 1) - timedelta(days=1)
     else:
-        end_date = date(year+1, 1, 1) - timedelta(days=1)
-
+        end_date = date(year+1, 1, 1)
         
     diary_list = Question.objects.filter(write_date__range=(start_date, end_date)).values()
 
@@ -76,11 +78,6 @@ def get_calendar_data(year, month):
 
     return calendar_weeks
 
-
-def diary_create(request):
-    
-    return render(request, 'pybo/diary_create.html')
-
 def diary_detail(request, dates, key):
     
     dates = datetime.strptime(dates, '%Y-%m-%d').date()
@@ -101,14 +98,28 @@ def diary_modify(request, dates, key):
 
 def diary_delete(request, dates, key):
     dates = datetime.strptime(dates, '%Y-%m-%d').date()
-    
+    date_list = dates.split('-')
     delete_object = Question.objects.filter(write_date__date=dates).order_by('write_date')
     delete_object = delete_object[int(key)-1]
     delete_object.delete()
     
     #return redirect('pybo:main')
-    return redirect(f'/pybo/?years={2023}&month={6}')
+    return redirect(f'/pybo/?years={date_list[0]}&month={date_list[1]}')
 
 
-def test(request):
-    return render(request, 'pybo/diary_create.html')
+def diary_create(request):
+    if request.method == "POST":
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            diary = form.save(commit=False)
+            diary.author = 'User'
+            years = diary.write_date.year
+            month = diary.write_date.month
+            diary.save()
+            return redirect(f'/pybo/?years={years}&month={month}')
+    else:
+        form = QuestionForm()
+    
+    context = {'form': form}
+    
+    return render(request, 'pybo/diary_create.html', context)
