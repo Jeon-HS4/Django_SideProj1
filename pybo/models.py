@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.fields.related import ManyToManyField
+from django.utils import timezone
 
 
 class Question(models.Model):
@@ -11,7 +12,7 @@ class Question(models.Model):
     content = models.TextField()
     category = models.CharField(max_length=50, default="diary")
     addFile = models.FileField(upload_to='uploads/', null=True, blank=True)
-    write_date = models.DateTimeField()
+    write_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.title
