@@ -11,9 +11,13 @@ from calendar import monthrange
 
 
 def main(request):
-    year = int(request.GET.get('years',2023)) # 해당 년 정보
-    month = int(request.GET.get('month',5)) # 해당 월 정보  
-
+    current_datetime = timezone.now()
+    default_year = current_datetime.year
+    default_month = current_datetime.month
+    
+    year = int(request.GET.get('years',default_year)) # 해당 년 정보
+    month = int(request.GET.get('month',default_month)) # 해당 월 정보  
+    
     start_date = date(year, month, 1)  # 2023년 6월 1일
     if(month != 12):
         end_date = date(year, month+1, 1) - timedelta(days=1)
@@ -23,12 +27,12 @@ def main(request):
     diary_list = Question.objects.filter(write_date__range=(start_date, end_date)).values()
 
     calendar_weeks = get_calendar_data(year, month)
-    
+
     addcontext = {}
     if diary_list:
         for diary in diary_list:
             cnt = 1
-            day = str(diary['write_date'].day) + " " +str(cnt)
+            day = str((diary['write_date'] + timedelta(hours=9)).day) + " " +str(cnt)
             if(day in addcontext):
                 cnt += 1
                 day = str(diary['write_date'].day) + " " +str(cnt)
@@ -90,9 +94,34 @@ def diary_detail(request, dates, key):
     return render(request,'pybo/diary_detail.html', context)
 
 
-def diary_modify(request, dates, key):
+def diary_modify_form(request, dates, key):
     
-    return render(request, 'pybo/diary_modify.html')
+    dates = datetime.strptime(dates, '%Y-%m-%d').date()
+
+    context_list = Question.objects.filter(write_date__date=dates).order_by('write_date')
+    detail_context = context_list[int(key)-1]
+    
+    context = {'detail_context': detail_context, 'data_key':key}
+    
+    return render(request, 'pybo/diary_modify.html', context)
+
+
+def diary_modify(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if request.user != question.author:
+        messages.error(request,"수정 권한이 없습니다")
+        return redirect('pybo:detail', question_id=question.id)
+    if request.method == "POST":
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.modify_date = timezone.now()
+            question.save()
+            return redirect('pybo:detail', question_id=question.id)
+    else:
+        form = QuestionForm(instance=question)
+    context = {'form':form}
+    return render(request, 'pybo/question_form.html', context)
 
 
 

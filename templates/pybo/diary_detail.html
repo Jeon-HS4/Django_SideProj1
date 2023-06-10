@@ -33,7 +33,7 @@
 
         <div class="btn"><a class="goCalendar" href="{% url 'pybo:main' %}">돌아가기</a></div>
         <div class="btn"><a id="delete_diary" href="javascript:void(0)"data-uri="{% url 'pybo:diary_delete' detail_context.write_date|date:'Y-m-d' data_key  %}">삭제</a></div>
-        <div class="btn"><a class="goModify" href="{% url 'pybo:diary_modify' detail_context.write_date|date:'Y-m-d' key %}">수정</a></div>
+        <div class="btn"><a class="goModify" href="{% url 'pybo:diary_modify_form' detail_context.write_date|date:'Y-m-d' data_key %}">수정</a></div>
 
 
       </div>

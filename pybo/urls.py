@@ -14,7 +14,7 @@ urlpatterns = [
     path('diary/detail/<str:dates><str:key>/',
          views.diary_detail, name='diary_detail'),
     path('diary/modify/<str:dates><str:key>/',
-         views.diary_modify, name='diary_modify'),
+         views.diary_modify_form, name='diary_modify_form'),
     path('diary/delete/<str:dates><str:key>/',
          views.diary_delete, name='diary_delete'),
 
